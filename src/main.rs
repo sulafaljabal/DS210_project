@@ -9,6 +9,7 @@ fn main() {
 
     let mut x = "soc-redditHyperlinks-body.tsv";
     let file = File::open(x).expect("Could not open file");
+    println!("{:?}", file);
 
 }
 
