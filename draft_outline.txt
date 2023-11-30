@@ -1,0 +1,12 @@
+Functions need to be split into modules
+
+Functions needed:
+    1- Read file
+    2- Hashmap creation for post_id
+    3- Collection of functions for:
+        a. Figure out unique numbers of hyperlinks in hashmap
+        b. Number of posts that have 1/2/3 hyperlink (more is not necessary)
+        c. ???
+        
+Current (existing)functions:
+    1- ???
