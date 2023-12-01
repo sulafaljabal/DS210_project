@@ -3,10 +3,25 @@ Functions need to be split into modules
 Functions needed:
     1- Read file
     2- Hashmap creation for post_id
+    3- Extra Hashmap creation for post_id (need numbered 0-n)
     3- Collection of functions for:
         a. Figure out unique numbers of hyperlinks in hashmap
         b. Number of posts that have 1/2/3 hyperlink (more is not necessary)
         c. ???
-        
+
 Current (existing)functions:
     1- ???
+
+Variety of data types
+1- Hashmaps
+2- Vectors
+3- 
+*** Enums and structs not likely ***
+Structs:
+    1- ???
+
+To do
+1- Read file
+2- Create hashmap for subreddit and number of links
+3- Create graph for subreddit to subreddit links
+4- Hashmap macro exists!!!!!!!!!!
