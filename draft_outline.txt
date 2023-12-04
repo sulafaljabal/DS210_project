@@ -21,7 +21,10 @@ Structs:
     1- ???
 
 To do
-1- Read file
-2- Create hashmap for subreddit and number of links
+1- Read file - DONE
+2- Create hashmap for subreddit numbers - DONE
+3- Find subreddit outedges!!
+    a- go through list again and create AdjacencyList for each node
+    b- create secondary hashmap for origin subreddit max nodes to outgoing subreddits (need global variable)
 3- Create graph for subreddit to subreddit links
 4- Hashmap macro exists!!!!!!!!!!
