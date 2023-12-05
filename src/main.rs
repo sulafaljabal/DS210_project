@@ -39,8 +39,11 @@ fn main() {
 
     //println!("Number of posts {:?}\nNumber of unique subreddits {:?}", post_id.len(), subreddit_info.len());
     //println!("{:?}, {:?}", subreddit_info.values().min(), subreddit_info.values().max());
-    let sub_hash = file_and_hashmap_stuff::read_file();
-    file_and_hashmap_stuff::output_hashmap(sub_hash);
+    let results = file_and_hashmap_stuff::read_file();
+    let sub_hash = results.0;
+    //file_and_hashmap_stuff::output_hashmap(sub_hash);
+ 
+    ////////////////////////////
     //let sum_1: Vec<_> = post_id.iter()
       //  .filter(|(&ref key, &value) | value == 1)
         //.map(|(&ref key, &value)| value)
@@ -68,12 +71,10 @@ mod file_and_hashmap_stuff {
     use std::fs::File;
     use std::io::BufRead;
     use std::env;
-    static origin_sub: Vec<String> = Vec::new();
-    static dest_sub: Vec<String> = Vec::new();
     // These static variables will be used to help create adjacency lists, provides a max number of subreddits origin
     // subreddit is linked to 
 
-    pub fn read_file() -> HashMap<String, usize>{
+    pub fn read_file() -> (HashMap<String, usize>, Vec<(String, String)>){
         let directory = env::set_current_dir("src"); //setting directory to src to get files
 
         let filename = "soc-redditHyperlinks-body.tsv";
@@ -83,12 +84,12 @@ mod file_and_hashmap_stuff {
 
         let mut post_id: Vec<String> = Vec::new(); // post_id, every time a post_id is found, 
         //we increment its value by 1
-        // I will be graphing post_id as the posts themselves represent the relationshps between subreddits
     
         let mut total_sent: Vec<i32> = Vec::new(); // total sentiment regardless of emotion
+        let mut sub_pairs: Vec<(String, String)> = Vec::new();
      
         let mut counter: usize = 0; // counter will be used to keep track of subreddit numbers
-        let mut max_subreddit_vertices:HashMap<String, usize> = HashMap::new(); 
+        let mut subreddit_info: HashMap<String, usize> = HashMap::new();
         // used to store max connections from origin subreddit to outgoing
         // nodes, this will be useful for 
         for line in buf_reader {
@@ -96,8 +97,10 @@ mod file_and_hashmap_stuff {
             let line_str = line.expect("Error reading");
             let v: Vec<&str> = line_str.trim().split("\t").collect();
             // going to keep track of everything in vectors in case I need them
-            origin_sub.push(v[0].parse::<String>().unwrap());
-            dest_sub.push(v[1].parse::<String>().unwrap());
+
+            let x = v[0].parse::<String>().unwrap();
+            let y = v[1].parse::<String>().unwrap();
+            sub_pairs.push((x,y));
             post_id.push(v[2].parse::<String>().unwrap());
             total_sent.push(v[3].parse::<i32>().unwrap());
             ///////// \
@@ -111,7 +114,7 @@ mod file_and_hashmap_stuff {
             subreddit_info = insert_hash(y, subreddit_info, counter);
             counter +=1;
         } 
-        subreddit_info
+        (subreddit_info, sub_pairs)
     }
 
     pub fn output_hashmap(sub_hash: HashMap<String,usize>) {
@@ -134,14 +137,30 @@ mod file_and_hashmap_stuff {
         // uses helper function create adjacency vector 
         // hashmap of original subreddit - (hashmaps of subreddits connected)
     }
-    pub fn create_adjacency_vector(current_sub: HashMap<String, usize>, origin_sub: Vec<String>, dest_sub:Vec<String>) {
+    pub fn create_adjacency_vector(current: HashMap<String, usize>, origin: Vec<String>, dest:Vec<String>) {
         //-> Vec<(HashMap<String, usize>, Vec<HashMap<String, usize>>)>
         //creates each vector in adjacency_list
         // uses 
 
     }
-    pub fn create_helper_hash() {
-        // creates secondary hash which takes all subreddits and 
+    pub fn create_graph(sub_hash: HashMap<String, usize>, sub_pairs: Vec<(String, String)>) -> 
+        (Graph, ListOfEdges) {
+        // creates secondary hash which takes all subreddits and puts max???
+        let mut sub_graph:HashMap<String, usize> = HashMap::new(); 
+        let mut my_adjacency_list: AdjacencyList = Vec::new(); 
+        for (i,j) in sub_pairs {
+            let x = sub_hash.get(&i); //getting number for origin subreddit
+            let y = sub_hash.get(&j); // getting number for desination subreddit
+            my_adjacency_list.push((x,y));
+
+            my_adjacency_list.push(() as ListOfEdges);
+            if Some(value) = max_subreddit_vertices.get_mut(i) {
+                *value.push(j);
+            } else {
+                max_subreddit_vertices.insert(i, vec![j]);
+            }
+        }
+
     }
 }
 
