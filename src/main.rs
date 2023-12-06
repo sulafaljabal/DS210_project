@@ -169,16 +169,13 @@ pub mod graph_stuff {
         // gets vector of usize tuples from grab_connections and creates x and y vectors for plotting purposes
         // x = values from 0 - number of subreddits
         // y = number of subreddits which have outgoing edges corresponding to x
-        let mut xy_vec: Vec<(usize, usize)> = vec![vec![]];
-        let mut xy_hash: HashMap<usize, usize> = HashMap::new();
+        let reverse_connections: 
+        let mut xy: Vec<(usize, usize)> = (0..=connections.len()).map(|x| (x, 0)).collect();
+        // empty vector: [(0,0), (1,0), (2,0), ..., (n,0)]
 
         for (_i,j) in connections {
             // i = subreddit number, j = number of outgoing nodes from subreddit i
-            if let Some(value) = xy_hash.get_mut(&j) { // checking if value j exists in hashmap
-                *value += 1; // if it does then increment by one
-            } else { // if it doesn't then create first instance of it 
-                xy_hash.insert(&j, 1);
-            }
+            xy.j += 1; // incrementing connection j by 1
         }
     }
 }
