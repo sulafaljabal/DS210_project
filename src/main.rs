@@ -1,11 +1,11 @@
 // Code needs to be split into modules
-struct Graph {
+pub struct Graph {
     n: usize,
     outedges: AdjacencyList,
 }
-type Vertex = usize;
-type ListOfEdges = Vec<(Vertex, Vertex)>;
-type AdjacencyList = Vec<Vec<Vertex>>;
+pub type Vertex = usize;
+pub type ListOfEdges = Vec<(Vertex, Vertex)>;
+pub type AdjacencyList = Vec<Vec<Vertex>>;
 
 impl Graph {
     fn add_directed_edges(&mut self, edges:&ListOfEdges) {
@@ -26,13 +26,6 @@ impl Graph {
     }
 }
 ////////
-struct Subreddit {
-    name: String,
-    n: usize,
-    count: usize,
-    outedges: AdjacencyList
-}
-
 
 fn main() {
     println!("Hello, world!?");
@@ -41,7 +34,10 @@ fn main() {
     //println!("{:?}, {:?}", subreddit_info.values().min(), subreddit_info.values().max());
     let results = file_and_hashmap_stuff::read_file();
     let sub_hash = results.0;
-    //file_and_hashmap_stuff::output_hashmap(sub_hash);
+    println!("{:?}, {:?}", sub_hash.len(), results.1.len());
+    let graph: Graph = graph_stuff::create_graph(sub_hash, results.1);
+    let connections: Vec<(usize, usize)> = graph_stuff::grab_connections(&graph);
+    //graph_stuff::output_n_graph(&graph, 10);
  
     ////////////////////////////
     //let sum_1: Vec<_> = post_id.iter()
@@ -66,11 +62,12 @@ fn main() {
 
 }
 mod file_and_hashmap_stuff {
-    //extern crate tsv;
     use std::collections::HashMap;
     use std::fs::File;
     use std::io::BufRead;
     use std::env;
+    use crate::Graph;
+    use crate::ListOfEdges;
     // These static variables will be used to help create adjacency lists, provides a max number of subreddits origin
     // subreddit is linked to 
 
@@ -107,60 +104,86 @@ mod file_and_hashmap_stuff {
             // starting to map out origin subreddit names to numbers
     
             let x = v[0].parse::<String>().unwrap();
-            subreddit_info = insert_hash(x, subreddit_info, counter);
-            counter +=1;
-
             let y = v[1].parse::<String>().unwrap();
-            subreddit_info = insert_hash(y, subreddit_info, counter);
-            counter +=1;
+
+            for i in [x,y]{ //going through x and y
+                match subreddit_info.get(&i){
+                    None => {
+                        subreddit_info.insert(i, counter);
+                        counter += 1; } // incrementing counter if subreddit doesn't exist in hashmap
+                    _ => {} // doing nothing if it already exists
+                }
+            }
         } 
+        println!("Counter = {:?}", counter);
         (subreddit_info, sub_pairs)
     }
 
-    pub fn output_hashmap(sub_hash: HashMap<String,usize>) {
+    pub fn _output_hashmap(sub_hash: HashMap<String,usize>) {
         for (key, value) in &sub_hash {
             println!("{:?}, {:?}", key, value);
         }
     }
 
-    pub fn insert_hash(x: String, mut sub_hash: HashMap<String, usize>, mut c: usize) -> HashMap<String, usize> {
-        match sub_hash.get(&x) {
-            None => {
-                sub_hash.insert(x, c);
-                c = c + 1;
-            }
-            _ => {}
-        }
-        sub_hash
-    }
-    pub fn create_adjacency_list() {
-        // uses helper function create adjacency vector 
-        // hashmap of original subreddit - (hashmaps of subreddits connected)
-    }
-    pub fn create_adjacency_vector(current: HashMap<String, usize>, origin: Vec<String>, dest:Vec<String>) {
-        //-> Vec<(HashMap<String, usize>, Vec<HashMap<String, usize>>)>
-        //creates each vector in adjacency_list
-        // uses 
 
-    }
-    pub fn create_graph(sub_hash: HashMap<String, usize>, sub_pairs: Vec<(String, String)>) -> 
-        (Graph, ListOfEdges) {
+}
+pub mod graph_stuff {
+    use std::collections::HashMap;
+    use crate::Graph;
+    use crate::ListOfEdges;
+    pub fn create_graph(sub_hash: HashMap<String, usize>, sub_pairs: Vec<(String, String)>) -> Graph {
         // creates secondary hash which takes all subreddits and puts max???
-        let mut sub_graph:HashMap<String, usize> = HashMap::new(); 
-        let mut my_adjacency_list: AdjacencyList = Vec::new(); 
-        for (i,j) in sub_pairs {
-            let x = sub_hash.get(&i); //getting number for origin subreddit
-            let y = sub_hash.get(&j); // getting number for desination subreddit
-            my_adjacency_list.push((x,y));
+        let mut my_adjacency_list: ListOfEdges = Vec::new(); 
+        let mut n: usize = 0;
 
-            my_adjacency_list.push(() as ListOfEdges);
-            if Some(value) = max_subreddit_vertices.get_mut(i) {
-                *value.push(j);
-            } else {
-                max_subreddit_vertices.insert(i, vec![j]);
+        for (i,j) in sub_pairs {
+            let x = sub_hash.get(&i).unwrap(); //getting number for origin subreddit
+            let y = sub_hash.get(&j).unwrap(); // getting number for desination subreddit
+            my_adjacency_list.push((*x,*y)); //pushing new vertex pair into adjacency list
+            n += 1;
+        }
+        //my_adjacency_list.sort();
+        my_adjacency_list.sort();
+        let my_graph: Graph = Graph::create_directed(n, &my_adjacency_list);
+        my_graph
+    }
+    pub fn output_whole_graph(graph: &Graph){
+        for (i, l) in graph.outedges.iter().enumerate() {
+            println!("{} {:?}", i, *l);
+        }
+    }
+    pub fn output_n_graph(graph: &Graph, n: usize){
+        for (i, l) in graph.outedges.iter().take(n).enumerate() {
+            println!("{} {:?}", i, *l);
+        }
+    }
+    pub fn grab_connections(graph: &Graph) -> Vec<(usize, usize)> {
+        // gets number of outgoing edges from each subreddit and returns it
+        let mut x: Vec<(usize, usize)> = Vec::new();
+        for (i, l) in graph.outedges.iter().enumerate() {
+            x.push((i,l.len()));
+        }
+        x
+    }
+    pub fn create_xy(connections: Vec<(usize, usize)>) -> Vec<(usize, usize)> {
+        // gets vector of usize tuples from grab_connections and creates x and y vectors for plotting purposes
+        // x = values from 0 - number of subreddits
+        // y = number of subreddits which have outgoing edges corresponding to x
+        let mut xy_vec: Vec<(usize, usize)> = vec![vec![]];
+        let mut xy_hash: HashMap<usize, usize> = HashMap::new();
+
+        for (_i,j) in connections {
+            // i = subreddit number, j = number of outgoing nodes from subreddit i
+            if let Some(value) = xy_hash.get_mut(&j) { // checking if value j exists in hashmap
+                *value += 1; // if it does then increment by one
+            } else { // if it doesn't then create first instance of it 
+                xy_hash.insert(&j, 1);
             }
         }
-
     }
 }
+pub mod plotting_stuff{
+    //???
+}
+
 
