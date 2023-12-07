@@ -35,9 +35,14 @@ fn main() {
     let results = file_and_hashmap_stuff::read_file();
     let sub_hash = results.0;
     println!("{:?}, {:?}", sub_hash.len(), results.1.len());
-    let graph: Graph = graph_stuff::create_graph(sub_hash, results.1);
+    let graph: Graph = graph_stuff::create_graph(sub_hash.clone(), results.1);
     let connections: Vec<(usize, usize)> = graph_stuff::grab_connections(&graph);
     //graph_stuff::output_n_graph(&graph, 10);
+    let my_xy: Vec<(usize, usize)> = graph_stuff::create_xy(connections);
+    //for (key, value) in &sub_hash {
+    //    if *value == 4665{println!("Subreddit {:?}", key);}
+    //}
+    plotting_stuff::plot_graph();
  
     ////////////////////////////
     //let sum_1: Vec<_> = post_id.iter()
@@ -66,8 +71,6 @@ mod file_and_hashmap_stuff {
     use std::fs::File;
     use std::io::BufRead;
     use std::env;
-    use crate::Graph;
-    use crate::ListOfEdges;
     // These static variables will be used to help create adjacency lists, provides a max number of subreddits origin
     // subreddit is linked to 
 
@@ -159,6 +162,7 @@ pub mod graph_stuff {
     }
     pub fn grab_connections(graph: &Graph) -> Vec<(usize, usize)> {
         // gets number of outgoing edges from each subreddit and returns it
+        // returns x where x = (subreddit identifying number, number of outgoing hyperlinks)
         let mut x: Vec<(usize, usize)> = Vec::new();
         for (i, l) in graph.outedges.iter().enumerate() {
             x.push((i,l.len()));
@@ -169,18 +173,60 @@ pub mod graph_stuff {
         // gets vector of usize tuples from grab_connections and creates x and y vectors for plotting purposes
         // x = values from 0 - number of subreddits
         // y = number of subreddits which have outgoing edges corresponding to x
-        let reverse_connections: 
-        let mut xy: Vec<(usize, usize)> = (0..=connections.len()).map(|x| (x, 0)).collect();
+
+        // reversing connections to get largest number of connections from each subreddit
+        // not taking the subreddit identification number so variable is a vector of usizes
+        let reverse_connections: Vec<usize> = connections.iter().map(|&(first, second)|second).collect();
+
+        // getting maximum number of connections within this new vector just obtained
+        let max_connections: usize = *reverse_connections.iter().max().unwrap();
+        let mut xy: Vec<(usize, usize)> = (0..=max_connections).map(|x| (x, 0)).collect();
         // empty vector: [(0,0), (1,0), (2,0), ..., (n,0)]
+        println!("{:?}", max_connections);
+        //println!("{:?}", reverse_connections.iter().take(20).collect::<Vec<_>>());
+        for (i,j) in &connections {
+            if *j == max_connections {println!("{:?}", i);}
+        }
 
         for (_i,j) in connections {
             // i = subreddit number, j = number of outgoing nodes from subreddit i
-            xy.j += 1; // incrementing connection j by 1
+            xy[j].1 += 1; // incrementing connection j by 1
         }
+        xy
     }
 }
 pub mod plotting_stuff{
-    //??? hello?
+    use plotters::prelude::*;
+    pub fn plot_graph() -> Result<(), Box<dyn std::error::Error>> {
+        let root = BitMapBackend::new("plotters-doc-data/0.png", (640, 480)).into_drawing_area();
+        root.fill(&WHITE)?;
+        let mut chart = ChartBuilder::on(&root)
+            .caption("y=x^2", ("sans-serif", 50).into_font())
+            .margin(5)
+            .x_label_area_size(30)
+            .y_label_area_size(30)
+            .build_cartesian_2d(-1f32..1f32, -0.1f32..1f32)?;
+    
+        chart.configure_mesh().draw()?;
+    
+        chart
+            .draw_series(LineSeries::new(
+                (-50..=50).map(|x| x as f32 / 50.0).map(|x| (x, x * x)),
+                &RED,
+            ))?
+            .label("y = x^2")
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &RED));
+    
+        chart
+            .configure_series_labels()
+            .background_style(&WHITE.mix(0.8))
+            .border_style(&BLACK)
+            .draw()?;
+    
+        root.present()?;
+    
+        Ok(())
+    }
 }
 
 
