@@ -39,32 +39,14 @@ fn main() {
     let connections: Vec<(usize, usize)> = graph_stuff::grab_connections(&graph);
     //graph_stuff::output_n_graph(&graph, 10);
     let my_xy: Vec<(usize, usize)> = graph_stuff::create_xy(connections);
-    //for (key, value) in &sub_hash {
-    //    if *value == 4665{println!("Subreddit {:?}", key);}
-    //}
-    plotting_stuff::plot_graph();
+    println!("{:?}", my_xy);
+    println!("{:?}",plotting_stuff::plot_graph(my_xy.clone()));
+    let mut zero_counter: usize = 0;
+    for (i, j) in &my_xy{
+        if *j == 0{ zero_counter += 1;}
+    }
+    println!("{}", zero_counter);
  
-    ////////////////////////////
-    //let sum_1: Vec<_> = post_id.iter()
-      //  .filter(|(&ref key, &value) | value == 1)
-        //.map(|(&ref key, &value)| value)
-        //.collect::<Vec<_>>();
-
-   // println!("{:?}, {:?}", sum_1.len(), post_id.len());
-    // let unique_post_num: Vec<_> = post_id.iter()
-     //   .map(|(&ref key, &value)| value)
-      //  .collect::<Vec<_>>();
-    //unique_post_num.into_iter().unique();
-    // Have to write this inefficiently because I am not sure how to use built in functions
-    //let mut unique_post_num: Vec<String> = vec![];
-    //for (c,i) in zip(0..len(post_id),post_id.keys()) {
-     //   if !unique_post_num.contains(&i) {
-      //      unique_post_num.push(i.to_string());
-       //     println!("{:?}, {:?}",c, i);
-        //} // else move on
-    //}
-    //println!("Number of unique hyperlinks {:?}", unique_post_num.len());
-
 }
 mod file_and_hashmap_stuff {
     use std::collections::HashMap;
@@ -197,21 +179,22 @@ pub mod graph_stuff {
 }
 pub mod plotting_stuff{
     use plotters::prelude::*;
-    pub fn plot_graph() -> Result<(), Box<dyn std::error::Error>> {
-        let root = BitMapBackend::new("plotters-doc-data/0.png", (640, 480)).into_drawing_area();
+    pub fn plot_graph(xy: Vec<(usize, usize)>) -> Result<(), Box<dyn std::error::Error>> {
+        let root = BitMapBackend::new("graphs/0.png", (640, 480)).into_drawing_area();
         root.fill(&WHITE)?;
         let mut chart = ChartBuilder::on(&root)
-            .caption("y=x^2", ("sans-serif", 50).into_font())
+            .caption("Graphs??", ("sans-serif", 50).into_font())
             .margin(5)
             .x_label_area_size(30)
             .y_label_area_size(30)
-            .build_cartesian_2d(-1f32..1f32, -0.1f32..1f32)?;
+            .build_cartesian_2d(0f32..4666f32, 0f32..100f32)?;
     
         chart.configure_mesh().draw()?;
     
         chart
             .draw_series(LineSeries::new(
-                (-50..=50).map(|x| x as f32 / 50.0).map(|x| (x, x * x)),
+                //(-50..=50).map(|x| x as f32 / 50.0).map(|x| (x, x * x)),
+                xy.iter().map(|(x,y)| (*x as f32, *y as f32)),
                 &RED,
             ))?
             .label("y = x^2")
