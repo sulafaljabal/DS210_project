@@ -17,6 +17,7 @@ After creating this vector of tuples, I quickly noticed tha most of the subreddi
 
 My next step was to start graphing. I used some code on the (insert stuff here) to create my plot. I changed it accordingly 
 it managed to create the distribution of outgoing vertices like I'd hoped.
+
 ![Graph showcasing number of subreddits and their number of outgoing links](src/graphs/0.png)
 Unfortunately, it is clear that the distribution of outgoing vertex connections cleary resembeled that of a power law distribution, just as the professor said. The actual number of subreddits with 0 outgoing connections is a lot larger than what the graph showcases, I  created an artifical limit in the graph so that it was easier to see the other number of outgoing links. The subreddit with the largest number of outgoing links was called??? and it had 4000??? outgoing links. I honestly couldn't believe it and then when I searched it up I very quickly realized why [...].
 The next subreddits were [...]
