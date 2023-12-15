@@ -1,5 +1,5 @@
 [package]
-name = "DS210_project"
+name = "ds210_project"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 tsv = "0.1.1"
-plotters = "0.3.3"
+plotters = { git = "https://github.com/plotters-rs/plotters.git" }
